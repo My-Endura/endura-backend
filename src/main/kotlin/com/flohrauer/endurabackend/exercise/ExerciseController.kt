@@ -13,8 +13,11 @@ import java.util.*
 class ExerciseController(private val exerciseService: ExerciseService) {
 
     @GetMapping
-    fun getAll(): ResponseEntity<List<ExerciseResponse>> {
-        val exercises = exerciseService.getAll()
+    fun getAll(
+        @RequestParam(name = "name") nameFilter: String?,
+        @RequestParam(name = "muscle_groups") muscleGroupsFilter: List<UUID>?
+    ): ResponseEntity<List<ExerciseResponse>> {
+        val exercises = exerciseService.getAll(nameFilter, muscleGroupsFilter)
         return ResponseEntity.ok(exercises)
     }
 

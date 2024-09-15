@@ -6,6 +6,7 @@ import com.flohrauer.endurabackend.exercise.exception.ExerciseAlreadyExistsExcep
 import com.flohrauer.endurabackend.exercise.exception.ExerciseNotFoundException
 import com.flohrauer.endurabackend.musclegroup.MuscleGroupService
 import org.springframework.dao.DataIntegrityViolationException
+import org.springframework.data.jpa.domain.Specification
 import org.springframework.stereotype.Service
 import java.util.*
 
@@ -15,8 +16,12 @@ class ExerciseService(
     private val muscleGroupService: MuscleGroupService
 ) {
 
-    fun getAll(): List<ExerciseResponse> {
-        val exercises = exerciseRepository.findAll()
+    fun getAll(nameFilter: String?, muscleGroupsFilter: List<UUID>?): List<ExerciseResponse> {
+        val specification = Specification
+            .where(ExerciseSpecification.hasName(nameFilter))
+            .and(ExerciseSpecification.containsMuscleGroups(muscleGroupsFilter))
+
+        val exercises = exerciseRepository.findAll(specification)
         return exercises.map { it.toResponse() }
     }
 

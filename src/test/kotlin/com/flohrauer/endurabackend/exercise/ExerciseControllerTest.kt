@@ -49,6 +49,33 @@ class ExerciseControllerTest: BaseIntegrationTest() {
 
     @Test
     @Sql("/sql/exercise/setup_exercise.sql")
+    fun `should get all exercises targeting muscle group`() {
+        val requestParams = mapOf(
+            "muscle_groups" to listOf("559c03ed-98ba-4c0c-9e51-5dab46baff1a")
+        )
+
+        get("/exercise", requestParams).andExpect {
+            status { isOk() }
+            jsonPath("$.size()") { value(2) }
+
+            jsonPath("$[0].name") { value("Liegestütze") }
+            jsonPath("$[0].description") { value("Eine Übung für die Brust und Arme") }
+            jsonPath("$[0].instructions") { value("Leg dich auf den Bauch, stütze dich auf die Hände und die Zehen, und senke deinen Körper bis fast zum Boden.") }
+            jsonPath("$[0].muscleGroups.size()") { value(2) }
+            jsonPath("$[0].muscleGroups[0].name") { value("Arme") }
+            jsonPath("$[0].muscleGroups[1].name") { value("Brust") }
+
+            jsonPath("$[1].name") { value("Klimmzüge") }
+            jsonPath("$[1].description") { value("Eine Übung für den oberen Rücken") }
+            jsonPath("$[1].instructions") { value("Häng dich an eine Stange und zieh deinen Körper nach oben, bis dein Kinn über der Stange ist.") }
+            jsonPath("$[1].muscleGroups.size()") { value(2) }
+            jsonPath("$[1].muscleGroups[0].name") { value("Arme") }
+            jsonPath("$[1].muscleGroups[1].name") { value("Rücken") }
+        }
+    }
+
+    @Test
+    @Sql("/sql/exercise/setup_exercise.sql")
     fun `should get exercise by id from database`() {
         val exerciseId = UUID.fromString("a752da83-1281-4eba-9298-da041f249bb9")
         get("/exercise/$exerciseId").andExpect {

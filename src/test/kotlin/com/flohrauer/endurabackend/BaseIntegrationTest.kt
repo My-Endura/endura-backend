@@ -10,10 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.core.io.ClassPathResource
 import org.springframework.http.MediaType
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator
-import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.ResultActionsDsl
-import org.springframework.test.web.servlet.get
-import org.springframework.test.web.servlet.post
+import org.springframework.test.web.servlet.*
 import org.testcontainers.junit.jupiter.Testcontainers
 import javax.sql.DataSource
 
@@ -37,8 +34,10 @@ class BaseIntegrationTest {
         populator.execute(dataSource)
     }
 
-    protected fun get(url: String): ResultActionsDsl {
-        return mockMvc.get(url)
+    protected fun get(url: String, params: Map<String, List<String>>? = null): ResultActionsDsl {
+        return mockMvc.get(url) {
+            mapParams(params)
+        }
     }
 
     protected fun post(url: String, body: Any? = null): ResultActionsDsl {
@@ -46,5 +45,13 @@ class BaseIntegrationTest {
             content = body?.toJson()
             contentType = MediaType.APPLICATION_JSON
         }
+    }
+
+    private fun MockHttpServletRequestDsl.mapParams(params: Map<String, List<String>>? = null) {
+        val paramBuilders = params?.flatMap { (key, values) ->
+            values.map { Pair(key, it) }
+        }
+
+        paramBuilders?.forEach { (key, value) -> param(key, value) }
     }
 }
