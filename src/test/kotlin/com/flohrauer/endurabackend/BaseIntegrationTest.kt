@@ -47,6 +47,17 @@ class BaseIntegrationTest {
         }
     }
 
+    protected fun put(url: String, body: Any? = null): ResultActionsDsl {
+        return mockMvc.put(url) {
+            content = body?.toJson()
+            contentType = MediaType.APPLICATION_JSON
+        }
+    }
+
+    protected fun delete(url: String): ResultActionsDsl {
+        return mockMvc.delete(url)
+    }
+
     private fun MockHttpServletRequestDsl.mapParams(params: Map<String, List<String>>? = null) {
         val paramBuilders = params?.flatMap { (key, values) ->
             values.map { Pair(key, it) }
