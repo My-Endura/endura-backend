@@ -43,6 +43,10 @@ class ExerciseService(
         }
     }
 
+    fun getAllEntitiesByIds(exercisesIds: List<UUID>): List<Exercise> {
+        return exerciseRepository.findAllById(exercisesIds)
+    }
+
     private fun getEntityById(id: UUID): Exercise {
         return exerciseRepository.findById(id).orElseThrow {
             ExerciseNotFoundException()
