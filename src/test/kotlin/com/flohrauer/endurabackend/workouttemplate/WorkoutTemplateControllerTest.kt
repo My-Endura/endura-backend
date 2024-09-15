@@ -1,7 +1,9 @@
 package com.flohrauer.endurabackend.workouttemplate
 
 import com.flohrauer.endurabackend.BaseIntegrationTest
+import com.flohrauer.endurabackend.workouttemplate.dto.AddExerciseRequest
 import com.flohrauer.endurabackend.workouttemplate.dto.CreateWorkoutTemplateRequest
+import com.flohrauer.endurabackend.workouttemplate.dto.UpdateWorkoutTemplateRequest
 import org.springframework.test.context.jdbc.Sql
 import java.util.*
 import kotlin.test.Test
@@ -79,6 +81,67 @@ class WorkoutTemplateControllerTest: BaseIntegrationTest() {
             jsonPath("$.exercises[0].name") { value("Bauchpressen") }
             jsonPath("$.exercises[1].name") { value("Kniebeugen") }
             jsonPath("$.exercises[2].name") { value("Plank") }
+        }
+    }
+
+    @Test
+    @Sql("/sql/workouttemplate/setup_workout_template.sql")
+    fun `should update existing workout template`() {
+        val workoutTemplateId = UUID.fromString("ec31dbdd-4e70-4019-b5ec-a524d8521b9f")
+        val updateWorkoutTemplateRequest = UpdateWorkoutTemplateRequest(
+            name = "Donnerstag Sport",
+            description = "Sport am Donnerstag"
+        )
+
+        put("/workout-template/$workoutTemplateId", updateWorkoutTemplateRequest).andExpect {
+            status { isOk() }
+            jsonPath("$.name") { value("Donnerstag Sport") }
+            jsonPath("$.description") { value("Sport am Donnerstag") }
+            jsonPath("$.lastCompleted") { value(null) }
+            jsonPath("$.exercises.size()") { value(2) }
+            jsonPath("$.exercises[0].name") { value("Klimmzüge") }
+            jsonPath("$.exercises[1].name") { value("Liegestütze") }
+        }
+    }
+
+    @Test
+    @Sql("/sql/workouttemplate/setup_workout_template.sql")
+    fun `should add exercise to workout template`() {
+        val workoutTemplateId = UUID.fromString("ec31dbdd-4e70-4019-b5ec-a524d8521b9f") // Armtraining Montag
+        val exerciseId = UUID.fromString("3b092329-89c6-4bdb-bba7-24341dcf5ba1") // Kniebeugen
+        val addExerciseRequest = AddExerciseRequest(exerciseId)
+
+        post("/workout-template/$workoutTemplateId/exercise", addExerciseRequest).andExpect {
+            status { isCreated() }
+            jsonPath("$.name") { value("Armtraining Montag") }
+            jsonPath("$.description") { value("Armtraining für jeden Montag") }
+            jsonPath("$.lastCompleted") { value(null) }
+
+            jsonPath("$.exercises.size()") { value(3) }
+            jsonPath("$.exercises[0].name") { value("Klimmzüge") }
+            jsonPath("$.exercises[1].name") { value("Kniebeugen") }
+            jsonPath("$.exercises[2].name") { value("Liegestütze") }
+        }
+    }
+
+    @Test
+    @Sql("/sql/workouttemplate/setup_workout_template.sql")
+    fun `should remove exercise from workout template`() {
+        val workoutTemplateId = UUID.fromString("ec31dbdd-4e70-4019-b5ec-a524d8521b9f") // Armtraining Montag
+        val exerciseId = UUID.fromString("a752da83-1281-4eba-9298-da041f249bb9") // Liegestütze
+
+        delete("/workout-template/$workoutTemplateId/exercise/$exerciseId").andExpect {
+            status { isNoContent() }
+        }
+
+        get("/workout-template/$workoutTemplateId").andExpect {
+            status { isOk() }
+            jsonPath("$.name") { value("Armtraining Montag") }
+            jsonPath("$.description") { value("Armtraining für jeden Montag") }
+            jsonPath("$.lastCompleted") { value(null) }
+
+            jsonPath("$.exercises.size()") { value(1) }
+            jsonPath("$.exercises[0].name") { value("Klimmzüge") }
         }
     }
 }

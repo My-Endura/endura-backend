@@ -1,8 +1,11 @@
 package com.flohrauer.endurabackend.workouttemplate
 
 import com.flohrauer.endurabackend.exercise.ExerciseService
+import com.flohrauer.endurabackend.workouttemplate.dto.AddExerciseRequest
 import com.flohrauer.endurabackend.workouttemplate.dto.CreateWorkoutTemplateRequest
+import com.flohrauer.endurabackend.workouttemplate.dto.UpdateWorkoutTemplateRequest
 import com.flohrauer.endurabackend.workouttemplate.dto.WorkoutTemplateResponse
+import com.flohrauer.endurabackend.workouttemplate.exception.ExerciseAlreadyInWorkoutTemplateException
 import com.flohrauer.endurabackend.workouttemplate.exception.WorkoutTemplateAlreadyExistsException
 import com.flohrauer.endurabackend.workouttemplate.exception.WorkoutTemplateNotFoundException
 import org.springframework.dao.DataIntegrityViolationException
@@ -24,21 +27,53 @@ class WorkoutTemplateService(
         return getEntityById(id).toResponse()
     }
 
-    private fun getEntityById(id: UUID): WorkoutTemplate {
-        return workoutTemplateRepository.findById(id).orElseThrow {
-            WorkoutTemplateNotFoundException()
-        }
-    }
-
     fun create(createWorkoutTemplateRequest: CreateWorkoutTemplateRequest): WorkoutTemplateResponse {
         try {
             val exercises = exerciseService.getAllEntitiesByIds(createWorkoutTemplateRequest.exercisesIds)
-            val workoutTemplateEntity = createWorkoutTemplateRequest.toEntity(exercises.toSet())
+            val workoutTemplateEntity = createWorkoutTemplateRequest.toEntity(exercises.toMutableSet())
             val databaseTemplateEntity = workoutTemplateRepository.save(workoutTemplateEntity)
 
             return databaseTemplateEntity.toResponse()
         } catch (e: DataIntegrityViolationException) {
             throw WorkoutTemplateAlreadyExistsException()
+        }
+    }
+
+    fun update(id: UUID, updateWorkoutTemplateRequest: UpdateWorkoutTemplateRequest): WorkoutTemplateResponse {
+        try {
+            val workoutTemplateEntity = getEntityById(id)
+            val updatedWorkoutTemplate = workoutTemplateEntity.update(updateWorkoutTemplateRequest)
+            val databaseWorkoutTemplate = workoutTemplateRepository.save(updatedWorkoutTemplate)
+
+            return databaseWorkoutTemplate.toResponse()
+        } catch (e: DataIntegrityViolationException) {
+            throw WorkoutTemplateAlreadyExistsException()
+        }
+    }
+
+    fun addExercise(id: UUID, addExerciseRequest: AddExerciseRequest): WorkoutTemplateResponse {
+        try {
+            val workoutTemplateEntity = getEntityById(id)
+            val exerciseEntity = exerciseService.getEntityById(addExerciseRequest.id)
+            workoutTemplateEntity.exercises.add(exerciseEntity)
+
+            return workoutTemplateRepository.save(workoutTemplateEntity).toResponse()
+        } catch (e: DataIntegrityViolationException) {
+            throw ExerciseAlreadyInWorkoutTemplateException()
+        }
+    }
+
+    fun removeExercise(id: UUID, exerciseId: UUID): WorkoutTemplateResponse {
+        val workoutTemplateEntity = getEntityById(id)
+        val exerciseEntity = exerciseService.getEntityById(exerciseId)
+        workoutTemplateEntity.exercises.remove(exerciseEntity)
+
+        return workoutTemplateRepository.save(workoutTemplateEntity).toResponse()
+    }
+
+    private fun getEntityById(id: UUID): WorkoutTemplate {
+        return workoutTemplateRepository.findById(id).orElseThrow {
+            WorkoutTemplateNotFoundException()
         }
     }
 }

@@ -9,16 +9,16 @@ import java.time.LocalDateTime
 @Table(name = "workout_template")
 class WorkoutTemplate(
     @Column(name = "name")
-    val name: String,
+    var name: String,
     @Column(name = "description", nullable = true)
-    val description: String?,
+    var description: String?,
     @Column(name = "last_completed", nullable = true)
-    val lastCompleted: LocalDateTime? = null,
+    var lastCompleted: LocalDateTime? = null,
     @OneToMany
     @JoinTable(
         name = "workout_template_exercise",
         joinColumns = [JoinColumn(name = "workout_template_id")],
         inverseJoinColumns = [JoinColumn(name = "exercise_id")]
     )
-    val exercises: Set<Exercise> = emptySet()
+    val exercises: MutableSet<Exercise> = mutableSetOf()
 ): BaseEntity()
