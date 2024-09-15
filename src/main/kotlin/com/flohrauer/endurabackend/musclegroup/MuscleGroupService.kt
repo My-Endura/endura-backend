@@ -17,6 +17,10 @@ class MuscleGroupService(private val muscleGroupRepository: MuscleGroupRepositor
         return getEntityById(id).toResponse()
     }
 
+    fun getAllEntitiesByIds(ids: List<UUID>): List<MuscleGroup> {
+        return muscleGroupRepository.findAllById(ids)
+    }
+
     private fun getEntityById(id: UUID): MuscleGroup {
         return muscleGroupRepository.findById(id).orElseThrow {
             MuscleGroupNotFoundException()

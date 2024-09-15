@@ -3,5 +3,6 @@ create table exercise_muscle_group (
     muscle_group_id uuid not null,
     exercise_id uuid not null,
     constraint fk_muscle_group_id foreign key (muscle_group_id) references muscle_group(id),
-    constraint fk_exercise_id foreign key (exercise_id) references exercise(id)
+    constraint fk_exercise_id foreign key (exercise_id) references exercise(id),
+    constraint ux_exercise_muscle_group unique (muscle_group_id, exercise_id)
 );

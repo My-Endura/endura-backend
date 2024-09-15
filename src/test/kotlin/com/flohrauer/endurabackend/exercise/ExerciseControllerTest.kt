@@ -18,22 +18,32 @@ class ExerciseControllerTest: BaseIntegrationTest() {
             jsonPath("$[0].name") { value("Kniebeugen") }
             jsonPath("$[0].description") { value("Eine Übung für die Beine") }
             jsonPath("$[0].instructions") { value("Stell dich mit den Füßen schulterbreit auseinander und beuge die Knie, als ob du dich hinsetzen würdest.") }
+            jsonPath("$[0].muscleGroups.size()") { value(1) }
+            jsonPath("$[0].muscleGroups[0].name") { value("Oberschenkel") }
 
             jsonPath("$[1].name") { value("Liegestütze") }
             jsonPath("$[1].description") { value("Eine Übung für die Brust und Arme") }
             jsonPath("$[1].instructions") { value("Leg dich auf den Bauch, stütze dich auf die Hände und die Zehen, und senke deinen Körper bis fast zum Boden.") }
+            jsonPath("$[1].muscleGroups.size()") { value(2) }
+            jsonPath("$[1].muscleGroups[0].name") { value("Arme") }
+            jsonPath("$[1].muscleGroups[1].name") { value("Brust") }
 
             jsonPath("$[2].name") { value("Bauchpressen") }
             jsonPath("$[2].description") { value("Eine Übung für die Bauchmuskeln") }
             jsonPath("$[2].instructions") { value("Lieg auf dem Rücken, die Beine angewinkelt, und hebe den Oberkörper an, als ob du dich aufsetzen würdest.") }
+            jsonPath("$[2].muscleGroups") { isEmpty() }
 
             jsonPath("$[3].name") { value("Klimmzüge") }
             jsonPath("$[3].description") { value("Eine Übung für den oberen Rücken") }
             jsonPath("$[3].instructions") { value("Häng dich an eine Stange und zieh deinen Körper nach oben, bis dein Kinn über der Stange ist.") }
+            jsonPath("$[3].muscleGroups.size()") { value(2) }
+            jsonPath("$[3].muscleGroups[0].name") { value("Arme") }
+            jsonPath("$[3].muscleGroups[1].name") { value("Rücken") }
 
             jsonPath("$[4].name") { value("Plank") }
             jsonPath("$[4].description") { value("Eine Übung für die Körpermitte") }
             jsonPath("$[4].instructions") { value("Stütz dich auf die Unterarme und die Zehen, halte deinen Körper in einer geraden Linie.") }
+            jsonPath("$[4].muscleGroups") { isEmpty() }
         }
     }
 
@@ -46,6 +56,9 @@ class ExerciseControllerTest: BaseIntegrationTest() {
             jsonPath("$.name") { value("Liegestütze") }
             jsonPath("$.description") { value("Eine Übung für die Brust und Arme") }
             jsonPath("$.instructions") { value("Leg dich auf den Bauch, stütze dich auf die Hände und die Zehen, und senke deinen Körper bis fast zum Boden.") }
+            jsonPath("$.muscleGroups.size()") { value(2) }
+            jsonPath("$.muscleGroups[0].name") { value("Arme") }
+            jsonPath("$.muscleGroups[1].name") { value("Brust") }
         }
     }
 
@@ -61,11 +74,16 @@ class ExerciseControllerTest: BaseIntegrationTest() {
     }
 
     @Test
+    @Sql("/sql/exercise/setup_exercise.sql")
     fun `should create new exercise in database`() {
         val createExerciseRequest = CreateExerciseRequest(
             name = "Bench Press",
             description = "Exercise for building muscle",
-            instructions = null
+            instructions = null,
+            muscleGroupsIds = listOf(
+                UUID.fromString("e56d0340-daa6-4523-bb61-dd047eefa340"), // Brust
+                UUID.fromString("b69b80d2-fe63-4fde-ad54-7edbbab55236"), // Rücken
+            )
         )
 
         post("/exercise", createExerciseRequest).andExpect {
@@ -73,6 +91,9 @@ class ExerciseControllerTest: BaseIntegrationTest() {
             jsonPath("$.name") { value("Bench Press") }
             jsonPath("$.description") { value("Exercise for building muscle") }
             jsonPath("$.instructions") { value(null) }
+            jsonPath("$.muscleGroups.size()") { value(2) }
+            jsonPath("$.muscleGroups[0].name") { value("Brust") }
+            jsonPath("$.muscleGroups[1].name") { value("Rücken") }
         }
     }
 
@@ -82,7 +103,8 @@ class ExerciseControllerTest: BaseIntegrationTest() {
         val createExerciseRequest = CreateExerciseRequest(
             name = "Kniebeugen",
             description = null,
-            instructions = null
+            instructions = null,
+            muscleGroupsIds = emptyList()
         )
 
         post("/exercise", createExerciseRequest).andExpect {

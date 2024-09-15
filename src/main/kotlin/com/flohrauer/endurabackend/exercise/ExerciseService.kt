@@ -4,12 +4,16 @@ import com.flohrauer.endurabackend.exercise.dto.CreateExerciseRequest
 import com.flohrauer.endurabackend.exercise.dto.ExerciseResponse
 import com.flohrauer.endurabackend.exercise.exception.ExerciseAlreadyExistsException
 import com.flohrauer.endurabackend.exercise.exception.ExerciseNotFoundException
+import com.flohrauer.endurabackend.musclegroup.MuscleGroupService
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.stereotype.Service
 import java.util.*
 
 @Service
-class ExerciseService(private val exerciseRepository: ExerciseRepository) {
+class ExerciseService(
+    private val exerciseRepository: ExerciseRepository,
+    private val muscleGroupService: MuscleGroupService
+) {
 
     fun getAll(): List<ExerciseResponse> {
         val exercises = exerciseRepository.findAll()
@@ -22,7 +26,10 @@ class ExerciseService(private val exerciseRepository: ExerciseRepository) {
 
     fun create(createExerciseRequest: CreateExerciseRequest): ExerciseResponse {
         try {
-            val exerciseEntity = createExerciseRequest.toEntity()
+            val muscleGroups = muscleGroupService
+                .getAllEntitiesByIds(createExerciseRequest.muscleGroupsIds)
+                .toSet()
+            val exerciseEntity = createExerciseRequest.toEntity(muscleGroups)
             val databaseEntity = exerciseRepository.save(exerciseEntity)
 
             return databaseEntity.toResponse()
