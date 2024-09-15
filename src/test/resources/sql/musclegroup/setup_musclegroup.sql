@@ -1,0 +1,9 @@
+insert into muscle_group (id, name) values ('a5926568-0eb2-43d3-b4b5-435c56303b2e', 'Core');
+insert into muscle_group (id, name) values ('559c03ed-98ba-4c0c-9e51-5dab46baff1a', 'Arme');
+insert into muscle_group (id, name) values ('b69b80d2-fe63-4fde-ad54-7edbbab55236', 'Rücken');
+insert into muscle_group (id, name) values ('e56d0340-daa6-4523-bb61-dd047eefa340', 'Brust');
+insert into muscle_group (id, name) values ('939bb311-a691-4aa7-81c4-42de7c92dc51', 'Beine');
+insert into muscle_group (id, name) values ('fbaeb698-9c01-40c2-b8f7-ec6036462960', 'Schultern');
+insert into muscle_group (id, name) values ('af74f89b-2a2b-484d-a0c6-93f8edeedb7e', 'Cardio');
+insert into muscle_group (id, name) values ('97fe0ebb-ad4e-47ba-8f3d-8139e5898319', 'Ganzkörper');
+insert into muscle_group (id, name) values ('ba8ebf5b-5354-44aa-b12c-078943835df6', 'Andere');
