@@ -1,11 +1,11 @@
 package com.flohrauer.endurabackend.exercise
 
+import com.flohrauer.endurabackend.exercise.dto.CreateExerciseRequest
 import com.flohrauer.endurabackend.exercise.dto.ExerciseResponse
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Controller
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.*
+import java.net.URI
 import java.util.*
 
 @Controller
@@ -22,5 +22,14 @@ class ExerciseController(private val exerciseService: ExerciseService) {
     fun getById(@PathVariable id: UUID): ResponseEntity<ExerciseResponse> {
         val exercise = exerciseService.getById(id)
         return ResponseEntity.ok(exercise)
+    }
+
+    @PostMapping
+    fun create(@RequestBody createExerciseRequest: CreateExerciseRequest): ResponseEntity<ExerciseResponse> {
+        val exercise = exerciseService.create(createExerciseRequest)
+
+        return ResponseEntity
+            .created(URI.create("/exercise/${exercise.id}"))
+            .body(exercise)
     }
 }
