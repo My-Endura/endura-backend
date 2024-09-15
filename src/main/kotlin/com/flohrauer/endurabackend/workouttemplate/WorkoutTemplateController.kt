@@ -45,6 +45,12 @@ class WorkoutTemplateController(private val workoutTemplateService: WorkoutTempl
         return ResponseEntity.ok(workoutTemplate)
     }
 
+    @DeleteMapping("/{id}")
+    fun delete(@PathVariable id: UUID): ResponseEntity<Unit> {
+        workoutTemplateService.delete(id)
+        return ResponseEntity.noContent().build()
+    }
+
     @PostMapping("/{id}/exercise")
     fun addExercise(
         @PathVariable id: UUID,

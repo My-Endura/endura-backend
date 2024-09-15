@@ -51,6 +51,11 @@ class WorkoutTemplateService(
         }
     }
 
+    fun delete(id: UUID) {
+        val workoutTemplateEntity = getEntityById(id)
+        workoutTemplateRepository.delete(workoutTemplateEntity)
+    }
+
     fun addExercise(id: UUID, addExerciseRequest: AddExerciseRequest): WorkoutTemplateResponse {
         try {
             val workoutTemplateEntity = getEntityById(id)

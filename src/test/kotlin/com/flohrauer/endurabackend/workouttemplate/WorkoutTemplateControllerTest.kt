@@ -106,6 +106,21 @@ class WorkoutTemplateControllerTest: BaseIntegrationTest() {
 
     @Test
     @Sql("/sql/workouttemplate/setup_workout_template.sql")
+    fun `should delete workout template without deleting exercises`() {
+        val workoutTemplateId = UUID.fromString("36d629a7-5ad2-4aa0-8898-01a106424147") // Brusttag Dienstag
+
+        delete("/workout-template/$workoutTemplateId").andExpect {
+            status { isNoContent() }
+        }
+
+        get("/workout-template/$workoutTemplateId").andExpect {
+            status { isNotFound() }
+            jsonPath("$.message") { value("Workout template not found.") }
+        }
+    }
+
+    @Test
+    @Sql("/sql/workouttemplate/setup_workout_template.sql")
     fun `should add exercise to workout template`() {
         val workoutTemplateId = UUID.fromString("ec31dbdd-4e70-4019-b5ec-a524d8521b9f") // Armtraining Montag
         val exerciseId = UUID.fromString("3b092329-89c6-4bdb-bba7-24341dcf5ba1") // Kniebeugen
