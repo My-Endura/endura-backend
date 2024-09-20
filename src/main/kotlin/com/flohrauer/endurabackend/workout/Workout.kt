@@ -1,6 +1,7 @@
 package com.flohrauer.endurabackend.workout
 
 import com.flohrauer.endurabackend.core.BaseEntity
+import com.flohrauer.endurabackend.workoutexercise.WorkoutExercise
 import com.flohrauer.endurabackend.workouttemplate.WorkoutTemplate
 import jakarta.persistence.*
 import java.time.LocalDateTime
@@ -20,5 +21,12 @@ class Workout(
     var totalWeight: Long? = null,
     @OneToOne
     @JoinColumn(name = "workout_template_id")
-    val workoutTemplate: WorkoutTemplate? = null
+    val workoutTemplate: WorkoutTemplate? = null,
+    @OneToMany(cascade = [CascadeType.ALL])
+    @JoinTable(
+        name = "workout_exercise",
+        joinColumns = [JoinColumn(name = "workout_id")],
+        inverseJoinColumns = [JoinColumn(name = "exercise_id")],
+    )
+    val exercises: MutableList<WorkoutExercise> = mutableListOf()
 ): BaseEntity()

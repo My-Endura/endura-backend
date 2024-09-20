@@ -59,7 +59,7 @@ class WorkoutService(
         return workoutRepository.save(workoutEntity).toResponse()
     }
 
-    private fun getEntityById(id: UUID): Workout {
+    fun getEntityById(id: UUID): Workout {
         return workoutRepository.findById(id).orElseThrow {
             WorkoutNotFoundException()
         }
