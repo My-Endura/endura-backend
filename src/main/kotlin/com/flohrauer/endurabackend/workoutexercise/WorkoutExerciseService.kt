@@ -4,6 +4,7 @@ import com.flohrauer.endurabackend.exercise.ExerciseService
 import com.flohrauer.endurabackend.workout.WorkoutService
 import com.flohrauer.endurabackend.workoutexercise.dto.CreateWorkoutExerciseRequest
 import com.flohrauer.endurabackend.workoutexercise.dto.WorkoutExerciseResponse
+import com.flohrauer.endurabackend.workoutexercise.exception.WorkoutExerciseNotFoundException
 import org.springframework.stereotype.Service
 import java.util.*
 
@@ -24,5 +25,16 @@ class WorkoutExerciseService(
         val exercise = exerciseService.getEntityById(addWorkoutExerciseRequest.exerciseId)
         val entity = WorkoutExercise(workout, exercise)
         return workoutExerciseRepository.save(entity)
+    }
+
+    fun delete(workoutExerciseId: UUID) {
+        val entity = getEntityById(workoutExerciseId)
+        workoutExerciseRepository.delete(entity)
+    }
+
+    private fun getEntityById(id: UUID): WorkoutExercise {
+        return workoutExerciseRepository.findById(id).orElseThrow {
+            WorkoutExerciseNotFoundException()
+        }
     }
 }

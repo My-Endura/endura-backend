@@ -28,4 +28,13 @@ class WorkoutExerciseController (private val workoutExerciseService: WorkoutExer
             .created(URI.create("/workout/$workoutId"))
             .build()
     }
+
+    @DeleteMapping("/{id}")
+    fun delete(
+        @PathVariable(name = "workoutId") workoutId: UUID,
+        @PathVariable(name = "id") workoutExerciseId: UUID
+    ): ResponseEntity<Unit> {
+        workoutExerciseService.delete(workoutExerciseId)
+        return ResponseEntity.noContent().build()
+    }
 }
