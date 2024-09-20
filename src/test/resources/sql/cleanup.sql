@@ -1,3 +1,4 @@
+delete from workout;
 delete from workout_template_exercise;
 delete from workout_template;
 delete from exercise_muscle_group;

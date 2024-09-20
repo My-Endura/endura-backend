@@ -76,7 +76,7 @@ class WorkoutTemplateService(
         return workoutTemplateRepository.save(workoutTemplateEntity).toResponse()
     }
 
-    private fun getEntityById(id: UUID): WorkoutTemplate {
+    fun getEntityById(id: UUID): WorkoutTemplate {
         return workoutTemplateRepository.findById(id).orElseThrow {
             WorkoutTemplateNotFoundException()
         }
